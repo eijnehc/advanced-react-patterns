@@ -1,10 +1,5 @@
-import { createContext, use, useId, useState } from 'react'
-import { Switch } from '#shared/switch.tsx'
+import { useId, useState } from 'react'
 import { SlotContext } from './slots'
-
-// 🐨 delete all this context stuff
-type ToggleValue = { on: boolean; toggle: () => void; id: string }
-const ToggleContext = createContext<ToggleValue | null>(null)
 
 export function Toggle({
 	id,
@@ -20,48 +15,20 @@ export function Toggle({
 	const toggle = () => setOn(!on)
 
 	const labelProps = { htmlFor: id }
-	// 🐨 add props objects for onText, offText, and switch
+	const onTextProps = { hidden: on ? undefined : true }
+	const offTextProps = { hidden: on ? true : undefined }
+	const switchProps = { id, on, onClick: toggle }
 
 	return (
 		<SlotContext.Provider
 			value={{
 				label: labelProps,
-				// 🐨 add slots for onText, offText, and switch
+				onText: onTextProps,
+				offText: offTextProps,
+				switch: switchProps,
 			}}
 		>
-			{/* 🐨 get rid of the ToggleContext here */}
-			<ToggleContext.Provider value={{ on, toggle, id }}>
-				{children}
-			</ToggleContext.Provider>
+			{children}
 		</SlotContext.Provider>
 	)
-}
-
-// 🐨 delete everything below here!
-function useToggle() {
-	const context = use(ToggleContext)
-	if (!context) {
-		throw new Error(
-			'Cannot find ToggleContext. All Toggle components must be rendered within <Toggle />',
-		)
-	}
-	return context
-}
-
-export function ToggleOn({ children }: { children: React.ReactNode }) {
-	const { on } = useToggle()
-	return <>{on ? children : null}</>
-}
-
-export function ToggleOff({ children }: { children: React.ReactNode }) {
-	const { on } = useToggle()
-	return <>{on ? null : children}</>
-}
-
-type ToggleButtonProps = Omit<React.ComponentProps<typeof Switch>, 'on'> & {
-	on?: boolean
-}
-export function ToggleButton({ ...props }: ToggleButtonProps) {
-	const { on, toggle, id } = useToggle()
-	return <Switch {...props} id={id} on={on} onClick={toggle} />
 }

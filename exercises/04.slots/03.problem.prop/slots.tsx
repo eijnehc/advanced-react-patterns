@@ -5,11 +5,11 @@ type Slots = Record<string, Record<string, unknown>>
 export const SlotContext = createContext<Slots>({})
 
 function useSlotProps<Props>(
-	props: Props, // 🐨 this should now be Props & { slot?: string }
-	slot: string, // 🐨 rename this to "defaultSlot" and make it optional
+	props: Props & { slot?: string },
+	defaultSlot?: string,
 ): Props {
-	// 🐨 create a slot variable that is set to props.slot and falls back to the defaultSlot
-	// 🐨 if there's no slot, return the props as they are
+	const slot = props.slot ?? defaultSlot
+	if (!slot) return props
 
 	const slots = use(SlotContext)
 
@@ -19,27 +19,29 @@ function useSlotProps<Props>(
 	return { ...slots[slot], slot, ...props } as Props
 }
 
-// 🐨 add an optional slot to the props type here
-export function Label(props: React.ComponentProps<'label'>) {
+export function Label(
+	props: React.ComponentProps<'label'> & { slot?: string },
+) {
 	props = useSlotProps(props, 'label')
 	return <label {...props} />
 }
 
-// 🐨 add an optional slot to the props type here
-export function Input(props: React.ComponentProps<'input'>) {
+export function Input(
+	props: React.ComponentProps<'input'> & { slot?: string },
+) {
 	props = useSlotProps(props, 'input')
 	return <input {...props} />
 }
 
-// 🐨 add an optional slot to the props type here
-export function Text(props: React.ComponentProps<'span'>) {
+export function Text(props: React.ComponentProps<'span'> & { slot?: string }) {
 	props = useSlotProps(props, 'text')
 	return <span {...props} />
 }
 
-// 🐨 add an optional slot to the props type here
 export function Switch(
-	props: Omit<React.ComponentProps<typeof BaseSwitch>, 'on'>,
+	props: Omit<React.ComponentProps<typeof BaseSwitch>, 'on'> & {
+		slot?: string
+	},
 ) {
 	return (
 		<BaseSwitch
