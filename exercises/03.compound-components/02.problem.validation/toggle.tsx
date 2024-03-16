@@ -25,10 +25,21 @@ export function ToggleOff({ children }: { children: React.ReactNode }) {
 	return <>{on ? null : children}</>
 }
 
+function useToggle() {
+	const context = use(ToggleContext)
+	if (!context) {
+		throw new Error(
+			'Cannot find ToggleContext. All Toggle components must be rendered within <Toggle />',
+		)
+	}
+	return context
+}
+
 type ToggleButtonProps = Omit<React.ComponentProps<typeof Switch>, 'on'> & {
 	on?: boolean
 }
 export function ToggleButton({ ...props }: ToggleButtonProps) {
-	const { on, toggle } = use(ToggleContext)!
+	const { on, toggle } = useToggle()
+	
 	return <Switch {...props} on={on} onClick={toggle} />
 }
